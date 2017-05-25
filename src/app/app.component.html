@@ -1,27 +1,112 @@
 <div class="container">
   <div class="row">
     <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
-      <form>
-        <div id="user-data">
+      <!-- ngSubmit directive gives us only one event which will 
+        be triggered when a form is submitted -->
+      
+      <!-- to get access to the JSON representation of form created by
+       angular, set the local reference of form equal to "ngForm"-->
+
+      <!-- one way to get access to the form is to pass the local refernce -->
+      <!-- <form (ngSubmit)="onSubmit(f)" #f="ngForm"> -->
+      
+      <!-- other way is to access the form with @ViewChild -->
+      <!-- this also allows us to access the form before it is submitted -->
+      <form (ngSubmit)="onSubmit()" #f="ngForm">
+
+        <!-- ngModelGroup directive groups the control -->
+        <!-- ngModelGroup needs a string to be used as the key of the group -->
+
+        <!-- to get access to JSON representation of a group, place a local reference
+          and set it equal to ngModelGroup, just like we did for email field below with ngModel -->
+        <div
+          id="user-data"
+          ngModelGroup="userData"
+          #userData="ngModelGroup">
           <div class="form-group">
             <label for="username">Username</label>
-            <input type="text" id="username" class="form-control">
+            <!-- ngModel registers the element as control -->
+            <!-- control is what should be submitted with the form -->
+            <!-- control is added as a property in JSON representation of form 
+                with name as the key -->
+            <input 
+              type="text"
+              id="username"
+              class="form-control"
+              ngModel
+              name="username"
+              required>
           </div>
-          <button class="btn btn-default" type="button">Suggest an Username</button>
+          <button class="btn btn-default" type="button" (click)="suggestUserName()">Suggest an Username</button>
           <div class="form-group">
             <label for="email">Mail</label>
-            <input type="email" id="email" class="form-control">
+            <input
+              #email="ngModel"
+              type="email"
+              id="email"
+              class="form-control"
+              ngModel
+              name="email"
+              required
+              email>
+            <span
+              *ngIf="!email.valid && email.touched"
+              class="help-block">
+              Please enter a valid email!
+            </span>
           </div>
         </div>
+        <p *ngIf="!userData.valid && userData.touched">User data is invalid!</p>
         <div class="form-group">
           <label for="secret">Secret Questions</label>
-          <select id="secret" class="form-control">
+          <!-- use ngModel with property binding to set default values -->
+          <select
+            id="secret"
+            class="form-control"
+            [ngModel]="defaultQuestion"
+            name="secret">
             <option value="pet">Your first Pet?</option>
             <option value="teacher">Your first teacher?</option>
           </select>
         </div>
-        <button class="btn btn-primary" type="submit">Submit</button>
+        <div class="form-group">
+          <textarea
+            class="form-control"
+            name="questionAnswer"
+            rows="3"
+            [(ngModel)]="answer">
+          </textarea>
+        </div>
+        <p>Your reply: {{ answer }}</p>
+        <div class="radio" *ngFor="let gender of genders">
+          <label>
+            <input
+              type="radio"
+              name="gender"
+              ngModel
+              [value]="gender"
+              required>
+                {{ gender}}
+          </label>
+        </div>
+        <button
+          class="btn btn-primary"
+          type="submit"
+          [disabled]="!f.valid ">
+            Submit
+        </button>
       </form>
+    </div>
+  </div>
+  <hr>
+  <div class="row" *ngIf="submitted">
+    <div class="col-xs-12">
+      <h3>Your Data</h3>
+      <p>Username: {{ user.username }} </p>
+      <p>Mail: {{ user.email }} </p>
+      <p>Secret Question: {{ user.secretQuestion }} </p>
+      <p>Answer: {{ user.answer }} </p>
+      <p>Gender: {{ user.gender }} </p>
     </div>
   </div>
 </div>
